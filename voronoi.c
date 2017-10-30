@@ -94,8 +94,8 @@ void generate_distances(Heightmap heightmap, List* capitals) {
 	}
 }
 
-void voronoi(Heightmap heightmap, List* capitals) {
-	generate_distances(heightmap, capitals, target);
+void voronoi(Heightmap heightmap, List* capitals, SDL_Surface* target) {
+	generate_distances(heightmap, capitals);
 	
 	for (int y = 0; y < target->h; y++) {
 		for (int x = 0; x < target->w; x++) {
