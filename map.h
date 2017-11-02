@@ -33,6 +33,7 @@ typedef struct List List;
 #include "linkedlist.h"
 
 Heightmap read_heightmap(const char* filename, int width, int height);
+void free_heightmap(Heightmap heightmap);
 SDL_Surface* heightmap_to_surface(Heightmap heightmap);
 List* read_capitals(const char* filename);
 void* save_capitals(const char* filename, List* capitals);

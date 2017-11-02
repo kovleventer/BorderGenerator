@@ -12,8 +12,12 @@ void render(SDL_Surface* main, SDL_Surface* map, SDL_Surface* borders, List* cap
 	for (List* iter = capitals; iter != NULL; iter = iter->next) {
 		int x = iter->capital.position.x;
 		int y = iter->capital.position.y;
-		filledCircleRGBA(main, x, y, 10, 255, 255, 255, 255);
+		filledCircleRGBA(main, x, y, 10, 255, 0, 0, 255);
 	}
+	
+	stringRGBA(main, 10, 70, "Press 'r' to render the current borders", 0, 0, 255, 255);
+	stringRGBA(main, 10, 90, "Press 's' to save the current capitals", 0, 0, 255, 255);
+	stringRGBA(main, 10, 110, "Press 'c' to clear the list of capitals", 0, 0, 255, 255);
 	
 	SDL_Flip(main);
 }
@@ -64,6 +68,7 @@ void start(void) {
 	
 	
 	render(mainScreen, mapScreen, bordersScreen, capitals, isGenerated);
+	List* clicked = 0;
 	bool quit = false;
 	SDL_Event ev;
 	while(!quit) {
@@ -74,7 +79,8 @@ void start(void) {
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 				if (ev.button.button == SDL_BUTTON_LEFT) {
-					if (get_clicked(ev.button.x, ev.button.y, capitals) == NULL) {
+					clicked = get_clicked(ev.button.x, ev.button.y, capitals);
+					if (clicked == NULL) {
 						capitals = ll_add_item(capitals, (Capital){ (Point){ .x = ev.button.x, .y = ev.button.y}, (SDL_Color){rand() % 255, rand() % 255, rand() % 255 } });
 					}
 				} else if (ev.button.button == SDL_BUTTON_RIGHT) {
@@ -89,11 +95,37 @@ void start(void) {
 						save_capitals(capitalsPath, capitals);
 						break;
 					case SDLK_r:
-						voronoi(heightmap, capitals, bordersScreen);
-						isGenerated = true;
-						render(mainScreen, mapScreen, bordersScreen, capitals, isGenerated);
+						if (!isGenerated) {
+							voronoi(heightmap, capitals, bordersScreen);
+							isGenerated = true;
+							render(mainScreen, mapScreen, bordersScreen, capitals, isGenerated);
+						}
 						break;
+					case SDLK_c:
+						capitals = ll_free_list(capitals);
+						isGenerated = false;
+						render(mainScreen, mapScreen, bordersScreen, capitals, isGenerated);
 				}
+				break;
+			case SDL_MOUSEMOTION:
+				if (clicked != NULL) {
+					int x = ev.motion.x;
+					int y = ev.motion.y;
+					clicked->capital.position.x = x;
+					clicked->capital.position.y = y;
+					isGenerated = false;
+					render(mainScreen, mapScreen, bordersScreen, capitals, isGenerated);
+				}
+				break;
+			case SDL_MOUSEBUTTONUP:
+				clicked = NULL;
+				break;
 		}
 	}
+	
+	//Cleanup
+	ll_free_list(capitals);
+	free_heightmap(heightmap);
+	
+	SDL_Quit();
 }

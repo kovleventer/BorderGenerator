@@ -7,9 +7,9 @@ Heightmap read_heightmap(const char* filename, int width, int height) {
 		exit(1);
 	}
 	
-	PixelData*** array = (PixelData***)malloc(sizeof(PixelData**) * height);
-	for (int y = 0; y < width; y++) {
-		array[y] = (PixelData**)malloc(sizeof(PixelData*) * width);
+	PixelData*** array = (PixelData***)malloc(sizeof(PixelData**) * width);
+	for (int x = 0; x < width; x++) {
+		array[x] = (PixelData**)malloc(sizeof(PixelData*) * height);
 	}
 	
 	for (int y = 0; y < height; y++) {
@@ -29,33 +29,46 @@ Heightmap read_heightmap(const char* filename, int width, int height) {
 	return (Heightmap){ .width = width, .height = height, .data = array };
 }
 
+void free_heightmap(Heightmap heightmap) {
+	for (int y = 0; y < heightmap.height; y++) {
+		for (int x = 0; x < heightmap.width; x++) {
+			free(heightmap.data[x][y]);
+		}
+	}
+	for (int x = 0; x < heightmap.width; x++) {
+		free(heightmap.data[x]);
+	}
+	free(heightmap.data);
+}
+
 SDL_Surface* heightmap_to_surface(Heightmap heightmap) {
 	int w = heightmap.width;
 	int h = heightmap.height;
 	
+	// Palette generation
 	SDL_Color pal[2048];
 	struct {
 		int pos;
 		SDL_Color col;
-	} szinek[] = {
-        {   0,       {   0, 200,   0 } },
-        { 128,       {   0, 255,   0 } },
-        { 256,       {  60, 255,   0 } },
-        { 512,       { 128, 240,   0 } },
-        { 1024,      { 130, 255,   0 } },
-        { 2048,      { 255, 255, 255 } },
-        { -1 }
-    };
-    int i, j;
-    for (i = 0; szinek[i].pos != -1; ++i) {
-        int p1 = szinek[i].pos, p2 = szinek[i+1].pos;
-        SDL_Color c1 = szinek[i].col, c2 = szinek[i+1].col;
-        for (j = p1; j <= p2; j++) {
-            pal[j].r = c1.r + (c2.r - c1.r) * (j - p1) / (p2 - p1);
-            pal[j].g = c1.g + (c2.g - c1.g) * (j - p1) / (p2 - p1);
-            pal[j].b = c1.b + (c2.b - c1.b) * (j - p1) / (p2 - p1);
-        }
-    }
+	} colors[] = {
+		{   0,       {   0, 128,   0 } },
+		{ 128,       {   0, 200,   0 } },
+		{ 256,       {  64, 200,   0 } },
+		{ 512,       { 200, 200,   0 } },
+		{ 1024,      { 139,  69,  19 } },
+		{ 2048,      { 255, 200, 150 } },
+		{ -1 }
+	};
+	int i, j;
+	for (i = 0; colors[i].pos != -1; ++i) {
+		int p1 = colors[i].pos, p2 = colors[i+1].pos;
+		SDL_Color c1 = colors[i].col, c2 = colors[i+1].col;
+		for (j = p1; j <= p2; j++) {
+			pal[j].r = c1.r + (c2.r - c1.r) * (j - p1) / (p2 - p1);
+			pal[j].g = c1.g + (c2.g - c1.g) * (j - p1) / (p2 - p1);
+			pal[j].b = c1.b + (c2.b - c1.b) * (j - p1) / (p2 - p1);
+		}
+	}
 	
 	SDL_Surface* newSurface = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
 	if (newSurface == NULL) {

@@ -14,5 +14,6 @@ typedef struct List {
 
 List* ll_add_item(List* list, Capital c);
 List* ll_remove_item(List* list, List* element);
+List* ll_free_list(List* list);
 
 #endif // LINKEDLIST_H

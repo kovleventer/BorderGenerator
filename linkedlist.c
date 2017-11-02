@@ -31,3 +31,12 @@ List* ll_remove_item(List* list, List* element) {
 	}
 	return list;
 }
+
+List* ll_free_list(List* list) {
+	for (List* iter = list; iter != NULL;) {
+		List* next = iter->next;
+		free(iter);
+		iter = next;
+	}
+	return NULL;
+}
