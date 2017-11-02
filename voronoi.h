@@ -8,9 +8,12 @@
 
 #include "map.h"
 
+#define SQRT2 1.4142
+
 typedef struct Neighbors {
-	PixelData* n[8];
-	int size;
+	PixelData* nd[4];
+	PixelData* d[4];
+	int size_d, size_nd;
 } Neighbors;
 
 void reset_distances(Heightmap heightmap);

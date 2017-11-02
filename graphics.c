@@ -1,5 +1,7 @@
 #include "graphics.h"
 
+SDL_Surface* mainScreen;
+
 void render(SDL_Surface* main, SDL_Surface* map, SDL_Surface* borders, List* capitals, bool isGenerated) {
 	SDL_BlitSurface(map, NULL, main, NULL);
 	
@@ -16,13 +18,33 @@ void render(SDL_Surface* main, SDL_Surface* map, SDL_Surface* borders, List* cap
 	SDL_Flip(main);
 }
 
+List* get_clicked(int x, int y, List* l) {
+	for (List* iter = l; iter != NULL; iter = iter->next) {
+		
+		int dx = iter->capital.position.x - x;
+		int dy = iter->capital.position.y - y;
+		if (dx * dx + dy * dy < 100) {
+			return iter;
+		}
+	}
+	return NULL;
+}
+
+void tick(double percent) {
+	boxRGBA(mainScreen, 0, 0, percent * 1201 / 100, 50, 0, 0, 255, 255);
+	SDL_Flip(mainScreen);
+}
+
 void start(void) {
 	int scrW = 1920, scrH = 1080;
 	
-	SDL_Surface* mainScreen;
+	/*SDL_Surface* mainScreen;*/
 	SDL_Surface* mapScreen;
 	SDL_Surface* bordersScreen;
 	bool isGenerated = false;
+	
+	char heightmapPath[] = "data/merged.hgta";
+	char capitalsPath[] = "data/capitals.txt";
 	
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 	mainScreen = SDL_SetVideoMode(scrW, scrH, 0, SDL_ANYFORMAT);
@@ -30,11 +52,12 @@ void start(void) {
 		fprintf(stderr, "Can not open window\n");
 		exit(1);
 	}
+	SDL_WM_SetCaption("Border Generator", "Border Generator");
 	
-	Heightmap heightmap = read_heightmap("data/merged.hgta", 1201, 1201);
+	Heightmap heightmap = read_heightmap(heightmapPath, 1201, 1201);
 	mapScreen = heightmap_to_surface(heightmap);
 
-	List* capitals = read_capitals("data/capitals.txt");
+	List* capitals = read_capitals(capitalsPath);
 	
 	bordersScreen = SDL_CreateRGBSurface(0, scrW, scrH, 32, 0, 0, 0, 0);
 	SDL_SetAlpha(bordersScreen, SDL_SRCALPHA, 127);
@@ -50,19 +73,26 @@ void start(void) {
 				quit = true;
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				capitals = ll_add_item(capitals, (Capital){ (Point){ .x = ev.button.x, .y = ev.button.y}, (SDL_Color){rand() % 255, rand() % 255, rand() % 255 } });
+				if (ev.button.button == SDL_BUTTON_LEFT) {
+					if (get_clicked(ev.button.x, ev.button.y, capitals) == NULL) {
+						capitals = ll_add_item(capitals, (Capital){ (Point){ .x = ev.button.x, .y = ev.button.y}, (SDL_Color){rand() % 255, rand() % 255, rand() % 255 } });
+					}
+				} else if (ev.button.button == SDL_BUTTON_RIGHT) {
+					capitals = ll_remove_item(capitals, get_clicked(ev.button.x, ev.button.y, capitals));
+				}
 				isGenerated = false;
 				render(mainScreen, mapScreen, bordersScreen, capitals, isGenerated);
 				break;
 			case SDL_KEYDOWN:
 				switch (ev.key.keysym.sym) {
 					case SDLK_s:
-						save_capitals("data/capitals.txt", capitals);
+						save_capitals(capitalsPath, capitals);
 						break;
 					case SDLK_r:
 						voronoi(heightmap, capitals, bordersScreen);
 						isGenerated = true;
 						render(mainScreen, mapScreen, bordersScreen, capitals, isGenerated);
+						break;
 				}
 		}
 	}

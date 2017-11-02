@@ -13,6 +13,8 @@
 #include "voronoi.h"
 
 void render(SDL_Surface* main, SDL_Surface* map, SDL_Surface* borders, List* capitals, bool isGenerated);
+List* get_clicked(int x, int y, List* l);
+void tick(double percent);
 void start(void);
 
 #endif // GRAPHICS_H

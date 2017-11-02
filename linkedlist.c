@@ -15,3 +15,19 @@ List* ll_add_item(List* list, Capital c) {
 	iter->next->next = NULL;
 	return list;
 }
+
+List* ll_remove_item(List* list, List* element) {
+	if (list == NULL) return NULL;
+	if (list->next == NULL && list == element) {
+		free(list);
+		return NULL;
+	}
+	for (List* iter = list; iter->next != NULL; iter = iter->next) {
+		if (iter->next == element) {
+			free(iter->next);
+			iter->next = iter->next->next;
+			break;
+		}
+	}
+	return list;
+}

@@ -33,6 +33,30 @@ SDL_Surface* heightmap_to_surface(Heightmap heightmap) {
 	int w = heightmap.width;
 	int h = heightmap.height;
 	
+	SDL_Color pal[2048];
+	struct {
+		int pos;
+		SDL_Color col;
+	} szinek[] = {
+        {   0,       {   0, 200,   0 } },
+        { 128,       {   0, 255,   0 } },
+        { 256,       {  60, 255,   0 } },
+        { 512,       { 128, 240,   0 } },
+        { 1024,      { 130, 255,   0 } },
+        { 2048,      { 255, 255, 255 } },
+        { -1 }
+    };
+    int i, j;
+    for (i = 0; szinek[i].pos != -1; ++i) {
+        int p1 = szinek[i].pos, p2 = szinek[i+1].pos;
+        SDL_Color c1 = szinek[i].col, c2 = szinek[i+1].col;
+        for (j = p1; j <= p2; j++) {
+            pal[j].r = c1.r + (c2.r - c1.r) * (j - p1) / (p2 - p1);
+            pal[j].g = c1.g + (c2.g - c1.g) * (j - p1) / (p2 - p1);
+            pal[j].b = c1.b + (c2.b - c1.b) * (j - p1) / (p2 - p1);
+        }
+    }
+	
 	SDL_Surface* newSurface = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
 	if (newSurface == NULL) {
 		fprintf(stderr, "Can not create surface\n");
@@ -40,8 +64,11 @@ SDL_Surface* heightmap_to_surface(Heightmap heightmap) {
 	
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			unsigned char r = heightmap.data[x][y]->height;
-			pixelRGBA(newSurface, x, y, r, 0, 0, 255);
+			int h = heightmap.data[x][y]->height;
+			if (h >= 0 && h <= 2048) {
+				SDL_Color c = pal[h];
+				pixelRGBA(newSurface, x, y, c.r, c.g, c.b, 255);
+			}
 		}
 	}
 	
