@@ -12,7 +12,7 @@ void pq_switch(PriorityQueue* queue, int i1, int i2) {
 }
 
 PriorityQueue pq_create() {
-	PQ_Node* nodes = (PQ_Node*)malloc(PQ_BASE_SIZE * 10000 * sizeof(PQ_Node));
+	PQ_Node* nodes = (PQ_Node*)malloc(PQ_BASE_SIZE * 100000 * sizeof(PQ_Node));
 	return (PriorityQueue){ .nodes = nodes, .len = 0, .size = PQ_BASE_SIZE };
 }
 
