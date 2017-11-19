@@ -1,4 +1,4 @@
-CFLAGS = `sdl-config --cflags` -g
+CFLAGS = `sdl-config --cflags` -g -Wall
 LDFLAGS = -lm `sdl-config --libs` -lSDL_gfx
 EXEC = BorderGenerator
 

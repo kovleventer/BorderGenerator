@@ -1,6 +1,7 @@
 #include "linkedlist.h"
 
 List* ll_add_item(List* list, Capital c) {
+	// New list, if param list is NULL
 	if (list == NULL) {
 		List* newList = (List*)malloc(sizeof(List));
 		newList->capital = c;
@@ -24,8 +25,9 @@ List* ll_remove_item(List* list, List* element) {
 	}
 	for (List* iter = list; iter->next != NULL; iter = iter->next) {
 		if (iter->next == element) {
+			List* next = iter->next;
 			free(iter->next);
-			iter->next = iter->next->next;
+			iter->next = next->next;
 			break;
 		}
 	}
