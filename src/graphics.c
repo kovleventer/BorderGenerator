@@ -38,7 +38,9 @@ List* get_clicked(int x, int y, List* l) {
 
 void start(void) {
 	// Declaring variables
-	int scrW = 1920, scrH = 1080;
+	// Screen width and height are aligned to heightmap
+	int scrW = 1201 * 8 / 9 + 1;
+	int scrH = 1201 * 5 / 9 + 1;
 	
 	SDL_Surface* mainScreen;
 	SDL_Surface* mapScreen;
@@ -60,7 +62,7 @@ void start(void) {
 	srand(time(NULL));
 	
 	// Initializing variables and data
-	Heightmap heightmap = read_heightmap(heightmapPath, 1201, 1201);
+	Heightmap heightmap = read_heightmap(heightmapPath, scrW, scrH);
 	mapScreen = heightmap_to_surface(heightmap);
 
 	List* capitals = read_capitals(capitalsPath);

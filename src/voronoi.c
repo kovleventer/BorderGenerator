@@ -80,7 +80,6 @@ void voronoi(Heightmap heightmap, List* capitals, SDL_Surface* target) {
 	boxRGBA(target, 0, 0, target->w, target->h, 0, 0, 0, 255);
 	for (int y = 0; y < target->h; y++) {
 		for (int x = 0; x < target->w; x++) {
-			if (x >= 1201) continue;
 			if (heightmap.data[x][y]->closest == NULL) continue;
 			// Every pixel contatins information about the closest capital already
 			SDL_Color c = heightmap.data[x][y]->closest->borderColor;

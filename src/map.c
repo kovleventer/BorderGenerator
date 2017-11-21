@@ -55,8 +55,8 @@ SDL_Surface* heightmap_to_surface(Heightmap heightmap) {
 	// Palette generation
 	// Code from InfoC advent calendar
 	// Generates gradients between explicitly given points
-	// Max height is limited to 2048
-	SDL_Color pal[2048];
+	// Max height is limited to 2500
+	SDL_Color pal[2500];
 	struct {
 		int pos;
 		SDL_Color col;
@@ -68,6 +68,7 @@ SDL_Surface* heightmap_to_surface(Heightmap heightmap) {
 		{ 512,       { 200, 200,   0 } },
 		{ 1024,      { 139,  69,  19 } },
 		{ 2048,      { 200, 200, 200 } },
+		{ 2500,      { 255, 255, 255 } },
 		{ -1 }
 	};
 	int i, j;
@@ -90,7 +91,7 @@ SDL_Surface* heightmap_to_surface(Heightmap heightmap) {
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
 			int h = heightmap.data[x][y]->height;
-			if (h >= 0 && h <= 2048) {
+			if (h >= 0 && h <= 2500) {
 				// Only valid height are converted into pixels, the rest are black
 				SDL_Color c = pal[h];
 				pixelRGBA(newSurface, x, y, c.r, c.g, c.b, 255);
