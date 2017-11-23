@@ -81,7 +81,7 @@ void voronoi(Heightmap heightmap, List* capitals, SDL_Surface* target) {
 	for (int y = 0; y < target->h; y++) {
 		for (int x = 0; x < target->w; x++) {
 			if (heightmap.data[x][y]->closest == NULL) continue;
-			// Every pixel contatins information about the closest capital already
+			// Every pixel contains information about the closest capital already
 			SDL_Color c = heightmap.data[x][y]->closest->borderColor;
 			Neighbors n = get_neighbors(heightmap, heightmap.data[x][y]);
 			

@@ -147,6 +147,8 @@ void start(void) {
 	// Cleanup
 	ll_free_list(capitals);
 	free_heightmap(heightmap);
+	SDL_FreeSurface(mapScreen);
+	SDL_FreeSurface(bordersScreen);
 	
 	SDL_Quit();
 }
