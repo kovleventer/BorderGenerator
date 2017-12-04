@@ -49,8 +49,9 @@ Neighbors get_neighbors(Heightmap heightmap, PixelData* current);
  * This information is written back to the heightmap
  * @param heightmap The heightmap on which the pathfinding is based
  * @param capitals The list of the capitals
+ * @param function The distance calculation method's function pointer
  */
-void generate_distances(Heightmap heightmap, List* capitals);
+void generate_distances(Heightmap heightmap, List* capitals, int (*function)(int, int));
 
 
 /**
@@ -59,7 +60,8 @@ void generate_distances(Heightmap heightmap, List* capitals);
  * @param heightmap The heightmap
  * @param capitals Only passed to generate_distances
  * @param target The SDL_Surface to render to
+ * @param function The distance calculation method's function pointer
  */
-void voronoi(Heightmap heightmap, List* capitals, SDL_Surface* target);
+void voronoi(Heightmap heightmap, List* capitals, SDL_Surface* target, int (*function)(int, int));
 
 #endif // VORONOI_H

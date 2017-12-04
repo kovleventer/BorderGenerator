@@ -2,6 +2,7 @@
 
 #include "priorityqueue.h"
 #include "graphics.h"
+#include "functions.h"
 
 #define SQRT2 1.4142
 
@@ -36,7 +37,7 @@ Neighbors get_neighbors(Heightmap heightmap, PixelData* current) {
 	return n;
 }
 
-void generate_distances(Heightmap heightmap, List* capitals) {
+void generate_distances(Heightmap heightmap, List* capitals, int (*function)(int, int)) {
 	reset_distances(heightmap);
 	
 	PriorityQueue frontier = pq_create();
@@ -61,7 +62,9 @@ void generate_distances(Heightmap heightmap, List* capitals) {
 			PixelData* next = neighbors.n[i].pd;
 			if (next->height < 0) continue;
 			// Diagonal neighbors are penalized with a sqrt(2) multiplier
-			int newCost = current->distance + next->height * (neighbors.n[i].isDiagonal ? SQRT2 : 1);
+			int newCost = current->distance
+						+ function(current->height, next->height)
+						* (neighbors.n[i].isDiagonal ? SQRT2 : 1);
 			if (next->closest == NULL) {
 				next->distance = newCost;
 				next->closest = current->closest;
@@ -73,8 +76,8 @@ void generate_distances(Heightmap heightmap, List* capitals) {
 	free(frontier.nodes);
 }
 
-void voronoi(Heightmap heightmap, List* capitals, SDL_Surface* target) {
-	generate_distances(heightmap, capitals);
+void voronoi(Heightmap heightmap, List* capitals, SDL_Surface* target, int (*function)(int, int)) {
+	generate_distances(heightmap, capitals, function);
 	
 	// Clearing surface
 	boxRGBA(target, 0, 0, target->w, target->h, 0, 0, 0, 255);

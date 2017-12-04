@@ -1,5 +1,7 @@
 #include "graphics.h"
 
+#include "functions.h"
+
 void render(SDL_Surface* main, SDL_Surface* map, SDL_Surface* borders, List* capitals, bool isGenerated) {
 	// Heightmap
 	SDL_BlitSurface(map, NULL, main, NULL);
@@ -17,9 +19,11 @@ void render(SDL_Surface* main, SDL_Surface* map, SDL_Surface* borders, List* cap
 	}
 	
 	// Information texts
-	stringColor(main, 10, 10, "Press 'r' to render the current borders", 0x0000FFFF);
-	stringColor(main, 10, 30, "Press 's' to save the current capitals", 0x0000FFFF);
-	stringColor(main, 10, 50, "Press 'c' to clear the list of capitals", 0x0000FFFF);
+	uint32_t color = 0x0000FFFF;
+	stringColor(main, 10, 10, "Press 'r' to render the current borders", color);
+	stringColor(main, 10, 30, "Press 's' to save the current capitals", color);
+	stringColor(main, 10, 50, "Press 'c' to clear the list of capitals", color);
+	stringColor(main, 10, 70, "Press keys 0-4 to change the distance calculation function", color);
 	
 	SDL_Flip(main);
 }
@@ -71,6 +75,11 @@ void start(void) {
 	SDL_SetAlpha(bordersScreen, SDL_SRCALPHA, 127);
 	
 	
+	// Distance calculation functions
+	int (*functions[])(int, int) = { no_height, basic_height, delta_height, tanh_height, relu_height };
+	int funcIndex = 1;
+	
+	
 	// Mainloop
 	render(mainScreen, mapScreen, bordersScreen, capitals, isGenerated);
 	List* clicked = NULL;
@@ -109,10 +118,17 @@ void start(void) {
 						// S saves the capitals to a file
 						save_capitals(capitalsPath, capitals);
 						break;
+					case SDLK_0:
+					case SDLK_1:
+					case SDLK_2:
+					case SDLK_3:
+					case SDLK_4:
+						isGenerated = isGenerated && ((ev.key.keysym.sym - SDLK_0) == funcIndex);
+						funcIndex = ev.key.keysym.sym - SDLK_0;
 					case SDLK_r:
 						// R generates and renders the borders
 						if (!isGenerated) {
-							voronoi(heightmap, capitals, bordersScreen);
+							voronoi(heightmap, capitals, bordersScreen, functions[funcIndex]);
 							isGenerated = true;
 							render(mainScreen, mapScreen, bordersScreen, capitals, isGenerated);
 						}
