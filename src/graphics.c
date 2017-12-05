@@ -23,7 +23,7 @@ void render(SDL_Surface* main, SDL_Surface* map, SDL_Surface* borders, List* cap
 	stringColor(main, 10, 10, "Press 'r' to render the current borders", color);
 	stringColor(main, 10, 30, "Press 's' to save the current capitals", color);
 	stringColor(main, 10, 50, "Press 'c' to clear the list of capitals", color);
-	stringColor(main, 10, 70, "Press keys 0-4 to change the distance calculation function", color);
+	stringColor(main, 10, 70, "Press keys 0-8 to change the distance calculation function", color);
 	
 	SDL_Flip(main);
 }
@@ -76,7 +76,9 @@ void start(void) {
 	
 	
 	// Distance calculation functions
-	int (*functions[])(int, int) = { no_height, basic_height, delta_height, tanh_height, relu_height };
+	int (*functions[])(int, int) = { no_height, basic_height, delta_height, tanh_height,
+									relu_height, elu_height, softplus_height, sqrt_height,
+									sine_height };
 	int funcIndex = 1;
 	
 	
@@ -99,8 +101,8 @@ void start(void) {
 					if (clicked == NULL) {
 						// If no point is clicked, a new one is inserted with a random color
 						capitals = ll_add_item(capitals, (Capital){
-							(Point){ .x = ev.button.x, .y = ev.button.y},
-							(SDL_Color){rand() % 255, rand() % 255, rand() % 255 }
+							(Point){ .x = ev.button.x, .y = ev.button.y },
+							(SDL_Color){ rand() % 255, rand() % 255, rand() % 255 }
 						});
 					}
 				} else if (ev.button.button == SDL_BUTTON_RIGHT) {
@@ -123,6 +125,11 @@ void start(void) {
 					case SDLK_2:
 					case SDLK_3:
 					case SDLK_4:
+					case SDLK_5:
+					case SDLK_6:
+					case SDLK_7:
+					case SDLK_8:
+						// Keys 0-8 generates borders again with a different function if required
 						isGenerated = isGenerated && ((ev.key.keysym.sym - SDLK_0) == funcIndex);
 						funcIndex = ev.key.keysym.sym - SDLK_0;
 					case SDLK_r:
